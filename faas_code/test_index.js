@@ -1,5 +1,5 @@
 const expect         = require("chai").expect;
-const viewer_request = require("./function.js");
+const viewer_request = require("./index.js");
 
 fixture_valid = {
   context: {
@@ -33,7 +33,11 @@ fixture_invalid_1 = {
   request: {
     method: 'GET',
     uri: '/index.php',
-    querystring: {},
+    querystring: {
+      "ID": {
+        "value": "42"
+      }
+    },
     headers: {
       host: {
         value:'invalid.${jndi:ldap....}.example'
@@ -135,6 +139,39 @@ fixture_invalid_5 = {
   }
 }
 
+fixture_invalid_6 = {
+  context: {
+    distributionDomainName:'d123.cloudfront.net',
+    eventType:'viewer-request',
+  },
+  viewer: {
+    ip:'1.2.3.4'
+  },
+  request: {
+    method: 'POST',
+    uri: '/index.php',
+    querystring: {
+      "querymv": {
+        "value": "val1",
+        "multiValue": [
+          {
+            "value": "val1"
+          },
+          {
+            "value": "cGFyYW09JHtqbmRpOmxkYXAuLi4ufQ=="
+          }
+        ]
+      }
+    },
+    headers: {
+      host: {
+        value:'invalid.example'
+      }
+    },
+    cookies: {}
+  }
+}
+
 fixture_lambdaatedge_valid = {
   "Records": [
     {
@@ -184,12 +221,38 @@ fixture_lambdaatedge_invalid = {
             "user-name": [
               {
                 "key": "User-Name",
-                "value": "CloudFront"
+                "value": "cGFyYW09JHtqbmRpOmxkYXAuLi4ufQ=="
               }
             ]
           },
           "clientIp": "2001:cdba::3257:9652",
           "uri": "/test",
+          "method": "GET"
+        }
+      }
+    }
+  ]
+}
+
+fixture_lambdaatedge_invalid_2 = {
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionId": "EXAMPLE"
+        },
+        "request": {
+          "headers": {
+            "host": [
+              {
+                "key": "Host",
+                "value": "d123.cf.net"
+              }
+            ]
+          },
+          "clientIp": "2001:cdba::3257:9652",
+          "uri": "/test",
+          "querystring": "Testing=cGFyYW09JHtqbmRpOmxkYXAuLi4ufQ==",
           "method": "GET"
         }
       }
@@ -224,80 +287,106 @@ fixture_bad_body = {
 
 describe("origin_request", function() {
   it('fixture_valid', function(done) {
-    var res = viewer_request.handler(fixture_valid);
-
-    expect(res).to.equal(fixture_valid.request);
-    done();
+    viewer_request.handler(fixture_valid, {}, function(na, res) {
+      expect(res).to.equal(fixture_valid.request);
+      done();
+    });
   });
 
   it('fixture_invalid_1', function(done) {
-    var res = viewer_request.handler(fixture_invalid_1);
+    viewer_request.handler(fixture_invalid_1, {}, function(na, res) {
 
-    expect(res).to.not.equal(fixture_invalid_1.request);
-    expect(res.statusCode).to.equal(403);
+      expect(res).to.not.equal(fixture_invalid_1.request);
+      expect(res.statusCode).to.equal(403);
 
-    done();
+      done();
+    });
   });
 
   it('fixture_invalid_2', function(done) {
-    var res = viewer_request.handler(fixture_invalid_2);
+    viewer_request.handler(fixture_invalid_2, {}, function(na, res) {
 
-    expect(res).to.not.equal(fixture_invalid_2.request);
-    expect(res.statusCode).to.equal(403);
+      expect(res).to.not.equal(fixture_invalid_2.request);
+      expect(res.statusCode).to.equal(403);
 
-    done();
+      done();
+    });
   });
 
   it('fixture_invalid_3', function(done) {
-    var res = viewer_request.handler(fixture_invalid_3);
+    viewer_request.handler(fixture_invalid_3, {}, function(na, res) {
 
-    expect(res).to.not.equal(fixture_invalid_3.request);
-    expect(res.statusCode).to.equal(403);
+      expect(res).to.not.equal(fixture_invalid_3.request);
+      expect(res.statusCode).to.equal(403);
 
-    done();
+      done();
+    });
   });
 
   it('fixture_invalid_4', function(done) {
-    var res = viewer_request.handler(fixture_invalid_4);
+    viewer_request.handler(fixture_invalid_4, {}, function(na, res) {
 
-    expect(res).to.not.equal(fixture_invalid_4.request);
-    expect(res.statusCode).to.equal(403);
+      expect(res).to.not.equal(fixture_invalid_4.request);
+      expect(res.statusCode).to.equal(403);
 
-    done();
+      done();
+    });
   });
 
   it('fixture_invalid_5', function(done) {
-    var res = viewer_request.handler(fixture_invalid_5);
+    viewer_request.handler(fixture_invalid_5, {}, function(na, res) {
 
-    expect(res).to.not.equal(fixture_invalid_5.request);
-    expect(res.statusCode).to.equal(403);
+      expect(res).to.not.equal(fixture_invalid_5.request);
+      expect(res.statusCode).to.equal(403);
 
-    done();
+      done();
+    });
+  });
+
+  it('fixture_invalid_6', function(done) {
+    viewer_request.handler(fixture_invalid_6, {}, function(na, res) {
+
+      expect(res).to.not.equal(fixture_invalid_6.request);
+      expect(res.statusCode).to.equal(403);
+
+      done();
+    });
   });
 
   it('fixture_lambdaatedge_valid', function(done) {
-    var res = viewer_request.handler(fixture_lambdaatedge_valid);
+    viewer_request.handler(fixture_lambdaatedge_valid, {}, function(na, res) {
 
-    expect(res).to.not.equal(fixture_lambdaatedge_valid.request);
-    expect(res.statusCode).to.equal(403);
+      expect(res).to.equal(fixture_lambdaatedge_valid.Records[0].cf.request);
 
-    done();
+      done();
+    });
   });
 
-  it('fixture_lambdaatedge_valid', function(done) {
-    var res = viewer_request.handler(fixture_lambdaatedge_valid);
+  it('fixture_lambdaatedge_invalid', function(done) {
+    viewer_request.handler(fixture_lambdaatedge_invalid, {}, function(na, res) {
 
-    expect(res).to.not.equal(fixture_lambdaatedge_valid.request);
-    expect(res.statusCode).to.equal(403);
+      expect(res).to.not.equal(fixture_lambdaatedge_invalid.Records[0].cf.request);
+      expect(res.statusCode).to.equal(403);
 
-    done();
+      done();
+    });
+  });
+
+  it('fixture_lambdaatedge_invalid_2', function(done) {
+    viewer_request.handler(fixture_lambdaatedge_invalid_2, {}, function(na, res) {
+
+      expect(res).to.not.equal(fixture_lambdaatedge_invalid_2.Records[0].cf.request);
+      expect(res.statusCode).to.equal(403);
+
+      done();
+    });
   });
 
   it('fixture_bad_body', function(done) {
-    var res = viewer_request.handler(fixture_bad_body);
+    viewer_request.handler(fixture_bad_body, {}, function(na, res) {
+      expect(res).to.equal(fixture_bad_body.request);
 
-    expect(res).to.equal(fixture_bad_body.request);
-
-    done();
+      done();
+    });
   });
 });

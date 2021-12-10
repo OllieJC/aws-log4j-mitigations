@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha --reporter spec 'test_*.js'"
   },
-  "name": "router",
+  "name": "faas_log4j_blocking",
   "version": "1.0.0",
   "main": "index.js",
   "directories": {
@@ -17,11 +17,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OllieJC/aws-cloudfront-log4j-vuln.git"
+    "url": "git+https://github.com/OllieJC/aws-log4j-mitigations.git"
   },
   "bugs": {
-    "url": "https://github.com/OllieJC/aws-cloudfront-log4j-vuln/issues"
+    "url": "https://github.com/OllieJC/aws-log4j-mitigations/issues"
   },
-  "homepage": "https://github.com/OllieJC/aws-cloudfront-log4j-vuln",
+  "homepage": "https://github.com/OllieJC/aws-log4j-mitigations",
   "description": ""
 }
