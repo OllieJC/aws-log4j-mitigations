@@ -1,0 +1,27 @@
+{
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "mocha": "^8.3.2"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec 'test_*.js'"
+  },
+  "name": "router",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "."
+  },
+  "dependencies": {},
+  "author": "OllieJC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OllieJC/aws-cloudfront-log4j-vuln.git"
+  },
+  "bugs": {
+    "url": "https://github.com/OllieJC/aws-cloudfront-log4j-vuln/issues"
+  },
+  "homepage": "https://github.com/OllieJC/aws-cloudfront-log4j-vuln",
+  "description": ""
+}
