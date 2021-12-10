@@ -90,35 +90,51 @@ function jdniMatch(value, isBase64) {
 
   var res = false;
 
-  var jndiRegex = /(\$|\%24)\s*(\{|\%7b)\s*jndi\s*(\:|\%3a)/im;
+  var jndiRegex = /(?:\$|\%24)\s*(?:\{|\%7b)\s*jndi\s*(?:\:|\%3a)/im;
 
   if (value.match(jndiRegex)) {
     res = true;
   } else {
-    var jndiPossibleBase64 = /([A-Za-z0-9][A-Za-z0-9+/]*(?:am5kaQ|puZGkg|qbmRp|Sk5ESQ|pOREk|KTkRJ)[A-Za-z0-9+/]*(?:\={1,3}?))/;
+    if (isBase64) {
+      value = decodeBase64(value);
+    }
+    if (value.match(jndiRegex)) {
+      res = true;
+    }
+
+    var jndiPossibleBase64 = /([A-Za-z0-9][A-Za-z0-9+/]*(?:am5kaQ|puZGkg|qbmRp|Sk5ESQ|pOREk|KTkRJ)[A-Za-z0-9+/]*(?:\={1,3})?)/;
     var b64Matches = value.match(jndiPossibleBase64);
 
-    if (isBase64 || b64Matches) {
+    if (b64Matches) {
       for (var i = 0; i < b64Matches.length; i++) {
-        var test_value = "";
-
-        try {
-          test_value = String.bytesFrom(b64Matches[i], 'base64').toString();
-        } catch (e) {
-          console.log(`Base64 decode - failed to run String.bytesFrom: ${e}`)
-        }
-        try {
-          test_value = Buffer.from(b64Matches[i], 'base64').toString();
-        } catch (e) {
-          console.log(`Base64 decode - failed to run Buffer.from: ${e}`)
-        }
-
+        var test_value = decodeBase64(b64Matches[i]);
         if (test_value.match(jndiRegex)) {
           res = true;
           break;
         }
       }
     }
+  }
+
+  return res;
+}
+
+function decodeBase64(value) {
+  var res = "";
+
+  if (typeof(value) !== "string") {
+    return res;
+  }
+
+  try {
+    res = String.bytesFrom(value, 'base64').toString();
+  } catch (e) {
+    console.log(`decodeBase64 - failed to run String.bytesFrom: ${e}`)
+  }
+  try {
+    res = Buffer.from(value, 'base64').toString();
+  } catch (e) {
+    console.log(`decodeBase64 - failed to run Buffer.from: ${e}`)
   }
 
   return res;

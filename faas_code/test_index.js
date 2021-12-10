@@ -260,6 +260,57 @@ fixture_lambdaatedge_invalid_2 = {
   ]
 }
 
+fixture_lambdaatedge_invalid_3 = {
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionId": "EXAMPLE"
+        },
+        "request": {
+          "headers": {
+            "host": [
+              {
+                "key": "Host",
+                "value": "d123.cf.net"
+              }
+            ]
+          },
+          "clientIp": "2001:cdba::3257:9652",
+          "uri": "/test",
+          "querystring": "",
+          "method": "GET",
+          body: {
+            action: 'read-only',
+            data: 'bG9nPWNHRnlZVzA5Skh0cWJtUnBPbXhrJnB3ZD1UZXN0aW5nLi4u=',
+            encoding: 'base64',
+            inputTruncated: false
+          }
+        }
+      }
+    }
+  ]
+}
+
+fixture_lambdaatedge_invalid_4 = {
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionId": "EXAMPLE"
+        },
+        "request": {
+          "headers": {},
+          "method": "GET",
+          "querystring": {},
+          "uri": "/cGFyYW09JHtqbmRpOmxkYXAuLi4ufQ==",
+          "cookies": {}
+        }
+      }
+    }
+  ]
+}
+
 fixture_bad_body = {
   context: {
     distributionDomainName:'d123.cloudfront.net',
@@ -376,6 +427,26 @@ describe("origin_request", function() {
     viewer_request.handler(fixture_lambdaatedge_invalid_2, {}, function(na, res) {
 
       expect(res).to.not.equal(fixture_lambdaatedge_invalid_2.Records[0].cf.request);
+      expect(res.statusCode).to.equal(403);
+
+      done();
+    });
+  });
+
+  it('fixture_lambdaatedge_invalid_3', function(done) {
+    viewer_request.handler(fixture_lambdaatedge_invalid_3, {}, function(na, res) {
+
+      expect(res).to.not.equal(fixture_lambdaatedge_invalid_3.Records[0].cf.request);
+      expect(res.statusCode).to.equal(403);
+
+      done();
+    });
+  });
+
+  it('fixture_lambdaatedge_invalid_4', function(done) {
+    viewer_request.handler(fixture_lambdaatedge_invalid_4, {}, function(na, res) {
+
+      expect(res).to.not.equal(fixture_lambdaatedge_invalid_4.Records[0].cf.request);
       expect(res.statusCode).to.equal(403);
 
       done();
