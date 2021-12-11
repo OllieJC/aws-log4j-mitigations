@@ -18,7 +18,7 @@ resource "aws_wafv2_web_acl" "waf_acl" {
 
     statement {
       managed_rule_group_statement {
-        name        = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
         vendor_name = "AWS"
 
         # Excluding all these leaves only Log4JRCE
