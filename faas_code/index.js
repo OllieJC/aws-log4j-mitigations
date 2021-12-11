@@ -13,73 +13,48 @@ function handler(event) {
     } else {
       request = event.request;
     }
-    var headerKeys = Object.keys(request.headers);
-    var uri = request.uri;
 
-    var failureResponse = {
-      statusCode: 403,
-      statusDescription: "Forbidden"
+    if (testEventForJndi(event)) {
+      return {
+        statusCode: 403,
+        statusDescription: "Forbidden"
+      }
     };
 
-    // CloudFront Functions and Lambda@Edge:
-    if (jdniMatch(uri)) {
-      return failureResponse;
-    }
+    return request;
+}
 
-    if (typeof(request.querystring) === "string") {
-      if (jdniMatch(request.querystring)) {
-        return failureResponse;
-      }
-    } else if (typeof(request.querystring) === "object") {
-      var querystrings = Object.keys(request.querystring);
-      for (var j = 0; j < querystrings.length; j++) {
-        var qs = request.querystring[querystrings[j]];
-        if (typeof(qs.value) !== "undefined") {
-          if (jdniMatch(qs.value)) {
-            return failureResponse;
-          }
-        }
-        if (typeof(qs.multiValue) !== "undefined") {
-          for (var k = 0; k < qs.multiValue.length; k++) {
-            if (jdniMatch(qs.multiValue[k].value)) {
-              return failureResponse;
-            }
-          }
-        }
-      }
-    }
+function testEventForJndi(event) {
+  var request = null;
+  if (typeof(event.Records) !== "undefined") {
+    request = event.Records[0].cf.request;
+  } else {
+    request = event.request;
+  }
 
-    for (var i = 0; i < headerKeys.length; i++) {
-      var key = headerKeys[i];
+  var request_string = JSON.stringify(request);
 
-      var value;
-      if (typeof(request.headers[key].value) !== "undefined") {
-        value = request.headers[key].value;
-      } else if (typeof(request.headers[key][0].value) !== "undefined") {
-        value = request.headers[key][0].value;
-      }
+  if (jndiMatch(request_string)) {
+    return true;
+  }
 
-      if (jdniMatch(key) || jdniMatch(value)) {
-        return failureResponse;
-      }
-    }
-
-    // CloudFront Functions cannot access the body, only Lambda@Edge
-    // for Lambda@Edge you must choose IncludeBody=true (false by default)
-    if (typeof(request.body) !== "undefined") {
+  // CloudFront Functions cannot access the body, only Lambda@Edge.
+  // For Lambda@Edge you must choose IncludeBody=true (false by default)
+  if (typeof(request.body) !== "undefined") {
+    if (request.body.encoding == "base64") {
       try {
-        if (jdniMatch(request.body.data, (request.body.encoding == "base64"))) {
-          return failureResponse;
+        if (jndiMatch(request.body.data, true)) {
+          return true;
         }
       } catch (e) {
         console.log(`Failed to match the body for the request: ${e}`)
       }
     }
-
-    return request;
+  }
+  return false;
 }
 
-function jdniMatch(value, isBase64) {
+function jndiMatch(value, isBase64) {
   if (typeof(value) !== "string") {
     return false;
   }
@@ -100,17 +75,16 @@ function jdniMatch(value, isBase64) {
     }
     if (value.match(jndiRegex)) {
       res = true;
-    }
-
-    var jndiPossibleBase64 = /([A-Za-z0-9][A-Za-z0-9+/]*(?:am5kaQ|puZGkg|qbmRp|Sk5ESQ|pOREk|KTkRJ)[A-Za-z0-9+/]*(?:\={1,3})?)/;
-    var b64Matches = value.match(jndiPossibleBase64);
-
-    if (b64Matches) {
-      for (var i = 0; i < b64Matches.length; i++) {
-        var test_value = decodeBase64(b64Matches[i]);
-        if (test_value.match(jndiRegex)) {
-          res = true;
-          break;
+    } else {
+      var jndiPossibleBase64 = /([A-Za-z0-9][A-Za-z0-9+/]*(?:am5kaQ|puZGkg|qbmRp|Sk5ESQ|pOREk|KTkRJ)[A-Za-z0-9+/]*(?:\={1,3})?)/;
+      var b64Matches = value.match(jndiPossibleBase64);
+      if (b64Matches) {
+        for (var i = 0; i < b64Matches.length; i++) {
+          var test_value = decodeBase64(b64Matches[i]);
+          if (test_value.match(jndiRegex)) {
+            res = true;
+            break;
+          }
         }
       }
     }
