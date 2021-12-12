@@ -24,10 +24,10 @@ The main _engine_ of the code is using the following regex: `/(?:\$|\%24)(?:\{|\
 
 ### Lambda@Edge
 
-See [cloudfront/lambda@edge/](cloudfront/lambda%40edge/) for example Terraform of implementing the [faas_code/index.js] as a Lambda@Edge origin request.
+See [cloudfront/lambda@edge/](cloudfront/lambda%40edge/) for example Terraform of implementing the [faas_code/index.js](faas_code/index.js) as a Lambda@Edge origin request.
 
 ### CloudFront Functions
 
-See [cloudfront/functions/](cloudfront/functions/) for example Terraform of implementing the [faas_code/index.js] as a CloudFront Function viewer request.
+See [cloudfront/functions/](cloudfront/functions/) for example Terraform of implementing the [faas_code/index.js](faas_code/index.js) as a CloudFront Function viewer request.
 
 _Note:_ CloudFront Functions don't have an option to inspect the body (for example, where parameters from POST requests would end up).
