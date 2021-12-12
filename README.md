@@ -20,7 +20,7 @@ If you'd like more control over filtering, suggest using Lambda@Edge and in part
 
 The [faas_code/index.js](faas_code/index.js) attempts to capture bad inputs, it can also find base64 and test it (which systems may parse headers automatically before passing to log4j where it could be exploited).
 
-The main _engine_ of the code is using the following regex: `/(\$|\%24)\s*(\{|\%7b)\s*jndi\s*(\:|\%3a)/im;`
+The main _engine_ of the code is using the following regex: `/(?:\$|\%24)(?:\{|\%7b)[^\w]*?j[^\w]*?n[^\w]*?d[^\w]*?i[^\w]*?(?:\:|\%3a)/im;`
 
 ### Lambda@Edge
 

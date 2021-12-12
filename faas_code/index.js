@@ -65,7 +65,7 @@ function jndiMatch(value, isBase64) {
 
   var res = false;
 
-  var jndiRegex = /(?:\$|\%24)\s*(?:\{|\%7b)\s*jndi\s*(?:\:|\%3a)/im;
+  var jndiRegex = /(?:\$|\%24)(?:\{|\%7b)[^\w]*?j[^\w]*?n[^\w]*?d[^\w]*?i[^\w]*?(?:\:|\%3a)/im;
 
   if (value.match(jndiRegex)) {
     res = true;
